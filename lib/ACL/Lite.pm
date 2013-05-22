@@ -10,11 +10,11 @@ ACL::Lite - Liteweight and flexible ACL checks
 
 =head1 VERSION
 
-Version 0.0001
+Version 0.0002
 
 =cut
 
-our $VERSION = '0.0001';
+our $VERSION = '0.0002';
 
 =head1 SYNOPSIS
 
@@ -107,7 +107,7 @@ Returns first permission which grants access.
 
 sub check {
 	my ($self, $permissions, $uid) = @_;
-	my (@check);
+	my (@check, $user_permissions);
 
 	if (ref($permissions) eq 'ARRAY') {
 		@check = @$permissions;
@@ -120,19 +120,42 @@ sub check {
 		# mismatch on user identifier
 		return;
 	}
-	
-	if ($self->{volatile}) {
-		# load permissions
-		$self->{permissions} = $self->{sub}->();
-	}
+
+    $user_permissions = $self->permissions;
 
 	for my $perm (@check) {
-		if (exists $self->{permissions}->{$perm}) {
+		if (exists $user_permissions->{$perm}) {
 			return $perm;
 		}
 	}
 
 	return;
+}
+
+=head2 permissions
+
+Returns permissions as hash reference:
+
+    $perms = $acl->permissions;
+
+Returns permissions as list:
+
+    @perms = $acl->permissions;
+
+=cut
+
+sub permissions {
+    my ($self) = @_;
+
+    if ($self->{volatile}) {
+        $self->{permissions} = $self->{sub}->();
+    }
+
+    if (wantarray) {
+        return keys %{$self->{permissions}};
+    }
+
+    return $self->{permissions};
 }
 
 =head1 CAVEATS
@@ -184,7 +207,7 @@ L<http://search.cpan.org/dist/ACL-Lite/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2011 Stefan Hornburg (Racke).
+Copyright 2011-2013 Stefan Hornburg (Racke).
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
