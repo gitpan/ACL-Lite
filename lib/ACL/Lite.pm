@@ -10,11 +10,11 @@ ACL::Lite - Liteweight and flexible ACL checks
 
 =head1 VERSION
 
-Version 0.0003
+Version 0.0004
 
 =cut
 
-our $VERSION = '0.0003';
+our $VERSION = '0.0004';
 
 =head1 SYNOPSIS
 
@@ -97,7 +97,7 @@ sub new {
 			$self->{volatile} = 1;
 			$self->{sub} = $args{permissions};
 		}
-		else {
+		elsif (defined $args{permissions}) {
 			my @perms;
 
 			for my $perm (split(/$self->{separator}/, $args{permissions})) {
